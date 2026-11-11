@@ -1,0 +1,1503 @@
+{
+  "3": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b.safetensors",
+      "weight_dtype": "fp8_e4m3fn"
+    },
+    "_meta": {
+      "title": "FLUX.2 Klein 4B"
+    }
+  },
+  "4": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3_4b_fp8_scaled.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3 text encoder"
+    }
+  },
+  "5": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "6": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 832,
+      "height": 1040,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "832 × 1040 · 4:5"
+    }
+  },
+  "7": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 832,
+      "height": 1040
+    },
+    "_meta": {
+      "title": "4 steps · distilled"
+    }
+  },
+  "8": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Euler"
+    }
+  },
+  "9": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "A 25-year-old Caucasian female fashion model with fair skin and straight, naturally styled dark brown hair, wearing a plain slate navy short-sleeved fitted T-shirt and straight washed-blue ankle-length jeans with a plain hem. Full-body casting photo, a relaxed fashion stance with one foot forward, head to toe, feet visible and wearing plain charcoal ankle socks, no shoes. Simple natural expression and no accessories. Same seamless light neutral warm-gray studio cyclorama and matte warm-gray floor, bright soft diffused window light from upper left, gently falling contact shadow, no props, no visible horizon, a clean high-street fashion e-commerce photograph. Vertical 4:5 frame. ",
+      "clip": [
+        "4",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Casting · model and wardrobe · brief"
+    }
+  },
+  "10": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": [
+        "3",
+        0
+      ],
+      "conditioning": [
+        "9",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Conditioning + FLUX"
+    }
+  },
+  "11": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 890301
+    },
+    "_meta": {
+      "title": "Fixed seed"
+    }
+  },
+  "12": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "11",
+        0
+      ],
+      "guider": [
+        "10",
+        0
+      ],
+      "sampler": [
+        "8",
+        0
+      ],
+      "sigmas": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Generate frame"
+    }
+  },
+  "13": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "12",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Casting · model and wardrobe"
+    }
+  },
+  "14": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "13",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Cast reference"
+    }
+  },
+  "15": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "sneaker_side.png"
+    },
+    "_meta": {
+      "title": "Product reference · lateral shoe"
+    }
+  },
+  "16": {
+    "class_type": "ResizeAndPadImage",
+    "inputs": {
+      "image": [
+        "15",
+        0
+      ],
+      "target_width": 512,
+      "target_height": 512,
+      "padding_color": "white",
+      "interpolation": "lanczos"
+    },
+    "_meta": {
+      "title": "Fit shoe reference · 512 × 512"
+    }
+  },
+  "17": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "16",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Product reference latent"
+    }
+  },
+  "18": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "sneaker_heel.png"
+    },
+    "_meta": {
+      "title": "Product reference · heel angle"
+    }
+  },
+  "19": {
+    "class_type": "ResizeAndPadImage",
+    "inputs": {
+      "image": [
+        "18",
+        0
+      ],
+      "target_width": 512,
+      "target_height": 512,
+      "padding_color": "white",
+      "interpolation": "lanczos"
+    },
+    "_meta": {
+      "title": "Fit heel reference · 512 × 512"
+    }
+  },
+  "20": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "19",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Heel reference latent"
+    }
+  },
+  "21": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "A full-body fashion catalog photograph of the same woman in image 1, same hair and outfit, with both socks replaced by a matching left and right pair of the exact sneakers in image 2. Natural 3/4 pose, weight on one leg, front foot stepped slightly forward, both shoes visible. Keep the original green side stripe and heel patch, cream mesh, suede panels, and thin gum outsole. Clean hem above her ankles. Head and shoes entirely in frame, breathing room at top and bottom. Same seamless light neutral warm-gray studio cyclorama and matte warm-gray floor, bright soft diffused window light from upper left, gently falling contact shadow, no props, no visible horizon, a clean high-street fashion e-commerce photograph. Vertical 4:5 frame. ",
+      "clip": [
+        "4",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "01 · Full look · brief"
+    }
+  },
+  "22": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "21",
+        0
+      ],
+      "latent": [
+        "14",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Image 1 · cast"
+    }
+  },
+  "23": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "22",
+        0
+      ],
+      "latent": [
+        "17",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Image 2 · exact shoe"
+    }
+  },
+  "24": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": [
+        "3",
+        0
+      ],
+      "conditioning": [
+        "23",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Conditioning + FLUX"
+    }
+  },
+  "25": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 890312
+    },
+    "_meta": {
+      "title": "Fixed seed"
+    }
+  },
+  "26": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "25",
+        0
+      ],
+      "guider": [
+        "24",
+        0
+      ],
+      "sampler": [
+        "8",
+        0
+      ],
+      "sigmas": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Generate frame"
+    }
+  },
+  "27": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "26",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "01 · Full look"
+    }
+  },
+  "28": {
+    "class_type": "ImageCrop",
+    "inputs": {
+      "image": [
+        "27",
+        0
+      ],
+      "width": 832,
+      "height": 424,
+      "x": 0,
+      "y": 616
+    },
+    "_meta": {
+      "title": "Crop styling reference below the knee"
+    }
+  },
+  "29": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "28",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Worn reference · shoes and hem"
+    }
+  },
+  "30": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "A new tightly framed retail photograph of the same pair of sneakers from image 2 worn by the same woman from image 1. Camera at shoe height, clear OUTER SIDE profile of the leading LEFT foot pointing left, with the right foot resting a little behind it. Two feet only. Crop just above the ankles; show both shoes in full, centered and large. The dark green swept stripe, green heel panel, ivory suede and honey-gum outsole match image 2. Preserve the straight blue denim hems and the ribbed off-white socks of image 1, clearly visible above both shoes. Keep both socks identical to the styling reference. Same seamless light neutral warm-gray studio cyclorama and matte warm-gray floor, bright soft diffused window light from upper left, gently falling contact shadow, no props, no visible horizon, a clean high-street fashion e-commerce photograph. Vertical 4:5 frame. ",
+      "clip": [
+        "4",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "02 · On foot / outer side · brief"
+    }
+  },
+  "31": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "30",
+        0
+      ],
+      "latent": [
+        "29",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Image 1 · worn styling"
+    }
+  },
+  "32": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "31",
+        0
+      ],
+      "latent": [
+        "17",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Image 2 · exact shoe"
+    }
+  },
+  "33": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": [
+        "3",
+        0
+      ],
+      "conditioning": [
+        "32",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Conditioning + FLUX"
+    }
+  },
+  "34": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 890318
+    },
+    "_meta": {
+      "title": "Fixed seed"
+    }
+  },
+  "35": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "34",
+        0
+      ],
+      "guider": [
+        "33",
+        0
+      ],
+      "sampler": [
+        "8",
+        0
+      ],
+      "sigmas": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Generate frame"
+    }
+  },
+  "36": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "35",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "02 · On foot / outer side"
+    }
+  },
+  "37": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "A new close-up sneaker catalog photograph from the rear three-quarter angle. The same woman from image 1 in the same ankle-length washed-blue jeans wears the exact cream and green sneakers in image 2. The back of the left shoe and its dark green heel tab are closest to the camera and sharply visible, the toes point away toward the upper right. Use the rear shoe construction in image 3, and retain the off-white ribbed socks. Both feet are naturally planted, one slightly ahead. Crop below the knees, only lower legs and two shoes, both complete with space around them. Keep the same green side stripe, cream suede and mesh, and thin gum outsole. Same seamless light neutral warm-gray studio cyclorama and matte warm-gray floor, bright soft diffused window light from upper left, gently falling contact shadow, no props, no visible horizon, a clean high-street fashion e-commerce photograph. Vertical 4:5 frame. ",
+      "clip": [
+        "4",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "03 · On foot / heel · brief"
+    }
+  },
+  "38": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "37",
+        0
+      ],
+      "latent": [
+        "29",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Image 1 · worn styling"
+    }
+  },
+  "39": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "38",
+        0
+      ],
+      "latent": [
+        "17",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Image 2 · exact shoe"
+    }
+  },
+  "40": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "39",
+        0
+      ],
+      "latent": [
+        "20",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Image 3 · heel construction"
+    }
+  },
+  "41": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": [
+        "3",
+        0
+      ],
+      "conditioning": [
+        "40",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Conditioning + FLUX"
+    }
+  },
+  "42": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 890325
+    },
+    "_meta": {
+      "title": "Fixed seed"
+    }
+  },
+  "43": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "42",
+        0
+      ],
+      "guider": [
+        "41",
+        0
+      ],
+      "sampler": [
+        "8",
+        0
+      ],
+      "sigmas": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Generate frame"
+    }
+  },
+  "44": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "43",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "03 · On foot / heel"
+    }
+  },
+  "45": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "A clean e-commerce still life of the exact sneaker in image 1 as one matching left and right pair. Exactly two empty shoes. Arrange them diagonally on the studio floor, viewed from slightly above at a three-quarter angle. Front shoe shows its lateral side and toe; the other shoe is offset behind and shows its laces and heel. Both fully in frame. Preserve the cream mesh, ivory suede, dark forest-green swept stripe, green heel tab, cream laces and honey-gum outsole. Both tongues are plain cream fabric. No people, props, text, logos, window patterns or extra shoes. Same seamless light neutral warm-gray studio cyclorama and matte warm-gray floor, bright soft diffused window light from upper left, gently falling contact shadow, no props, no visible horizon, a clean high-street fashion e-commerce photograph. Vertical 4:5 frame. ",
+      "clip": [
+        "4",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "04 · Pair still life · brief"
+    }
+  },
+  "46": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "45",
+        0
+      ],
+      "latent": [
+        "17",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Image 1 · exact shoe"
+    }
+  },
+  "47": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": [
+        "3",
+        0
+      ],
+      "conditioning": [
+        "46",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Conditioning + FLUX"
+    }
+  },
+  "48": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 890332
+    },
+    "_meta": {
+      "title": "Fixed seed"
+    }
+  },
+  "49": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "48",
+        0
+      ],
+      "guider": [
+        "47",
+        0
+      ],
+      "sampler": [
+        "8",
+        0
+      ],
+      "sigmas": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Generate frame"
+    }
+  },
+  "50": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "49",
+        0
+      ],
+      "vae": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "04 · Pair still life"
+    }
+  },
+  "51": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "13",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Casting preview"
+    }
+  },
+  "52": {
+    "class_type": "ImageBatch",
+    "inputs": {
+      "image1": [
+        "27",
+        0
+      ],
+      "image2": [
+        "36",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "01 Full look + 02 Side"
+    }
+  },
+  "53": {
+    "class_type": "ImageBatch",
+    "inputs": {
+      "image1": [
+        "44",
+        0
+      ],
+      "image2": [
+        "50",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "03 Heel + 04 Pair"
+    }
+  },
+  "54": {
+    "class_type": "ImageBatch",
+    "inputs": {
+      "image1": [
+        "52",
+        0
+      ],
+      "image2": [
+        "53",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Four frames in shot order"
+    }
+  },
+  "55": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "sam3-fp16.safetensors"
+    },
+    "_meta": {
+      "title": "SAM3 · mask model"
+    }
+  },
+  "56": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "person",
+      "clip": [
+        "55",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Person silhouette"
+    }
+  },
+  "57": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "denim jeans",
+      "clip": [
+        "55",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Jeans in tight crops"
+    }
+  },
+  "58": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "sneakers",
+      "clip": [
+        "55",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Shoes and soles"
+    }
+  },
+  "59": {
+    "class_type": "ConditioningCombine",
+    "inputs": {
+      "conditioning_1": [
+        "56",
+        0
+      ],
+      "conditioning_2": [
+        "57",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Person + jeans"
+    }
+  },
+  "60": {
+    "class_type": "SAM3_Detect",
+    "inputs": {
+      "model": [
+        "55",
+        0
+      ],
+      "image": [
+        "54",
+        0
+      ],
+      "threshold": 0.35,
+      "refine_iterations": 1,
+      "individual_masks": false,
+      "conditioning": [
+        "59",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Segment person or denim"
+    }
+  },
+  "61": {
+    "class_type": "SAM3_Detect",
+    "inputs": {
+      "model": [
+        "55",
+        0
+      ],
+      "image": [
+        "54",
+        0
+      ],
+      "threshold": 0.35,
+      "refine_iterations": 1,
+      "individual_masks": false,
+      "conditioning": [
+        "58",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Segment the shoes"
+    }
+  },
+  "62": {
+    "class_type": "MaskComposite",
+    "inputs": {
+      "destination": [
+        "60",
+        0
+      ],
+      "source": [
+        "61",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "operation": "or"
+    },
+    "_meta": {
+      "title": "Union of subject and shoes"
+    }
+  },
+  "63": {
+    "class_type": "GrowMask",
+    "inputs": {
+      "mask": [
+        "62",
+        0
+      ],
+      "expand": -1,
+      "tapered_corners": true
+    },
+    "_meta": {
+      "title": "Trim background fringe · 1 px"
+    }
+  },
+  "64": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "63",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Subject edge · grayscale"
+    }
+  },
+  "65": {
+    "class_type": "ImageBlur",
+    "inputs": {
+      "image": [
+        "64",
+        0
+      ],
+      "blur_radius": 1,
+      "sigma": 0.65
+    },
+    "_meta": {
+      "title": "Subject edge · feather"
+    }
+  },
+  "66": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "65",
+        0
+      ],
+      "channel": "red"
+    },
+    "_meta": {
+      "title": "Subject edge · opacity"
+    }
+  },
+  "67": {
+    "class_type": "GrowMask",
+    "inputs": {
+      "mask": [
+        "61",
+        0
+      ],
+      "expand": 40,
+      "tapered_corners": true
+    },
+    "_meta": {
+      "title": "Limit shadows to the shoe area"
+    }
+  },
+  "68": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "67",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Shadow falloff · grayscale"
+    }
+  },
+  "69": {
+    "class_type": "ImageBlur",
+    "inputs": {
+      "image": [
+        "68",
+        0
+      ],
+      "blur_radius": 16,
+      "sigma": 7.0
+    },
+    "_meta": {
+      "title": "Shadow falloff · feather"
+    }
+  },
+  "70": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "69",
+        0
+      ],
+      "channel": "red"
+    },
+    "_meta": {
+      "title": "Shadow falloff · opacity"
+    }
+  },
+  "71": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "54",
+        0
+      ],
+      "channel": "green"
+    },
+    "_meta": {
+      "title": "Green channel · shadow proxy"
+    }
+  },
+  "72": {
+    "class_type": "InvertMask",
+    "inputs": {
+      "mask": [
+        "71",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Shadow darkness"
+    }
+  },
+  "73": {
+    "class_type": "SolidMask",
+    "inputs": {
+      "value": 0.2,
+      "width": 832,
+      "height": 1040
+    },
+    "_meta": {
+      "title": "Ignore light studio tones"
+    }
+  },
+  "74": {
+    "class_type": "MaskComposite",
+    "inputs": {
+      "destination": [
+        "72",
+        0
+      ],
+      "source": [
+        "73",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "operation": "subtract"
+    },
+    "_meta": {
+      "title": "Keep darker floor tones"
+    }
+  },
+  "75": {
+    "class_type": "MaskComposite",
+    "inputs": {
+      "destination": [
+        "74",
+        0
+      ],
+      "source": [
+        "70",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "operation": "multiply"
+    },
+    "_meta": {
+      "title": "Local contact shadow only"
+    }
+  },
+  "76": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": 832,
+      "height": 1040,
+      "batch_size": 4,
+      "color": 14605269
+    },
+    "_meta": {
+      "title": "Shared warm gray studio · #DEDBD5"
+    }
+  },
+  "77": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": 832,
+      "height": 1040,
+      "batch_size": 1,
+      "color": 4670269
+    },
+    "_meta": {
+      "title": "Neutral shadow tone"
+    }
+  },
+  "78": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "76",
+        0
+      ],
+      "source": [
+        "77",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "75",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Studio plate + contact shadow"
+    }
+  },
+  "79": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "78",
+        0
+      ],
+      "source": [
+        "54",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "66",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Composite all four frames"
+    }
+  },
+  "81": {
+    "class_type": "UpscaleModelLoader",
+    "inputs": {
+      "model_name": "4xUltrasharp_4xUltrasharpV10.pt"
+    },
+    "_meta": {
+      "title": "4x UltraSharp"
+    }
+  },
+  "82": {
+    "class_type": "ImageUpscaleWithModel",
+    "inputs": {
+      "upscale_model": [
+        "81",
+        0
+      ],
+      "image": [
+        "79",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Texture recovery · model upscale"
+    }
+  },
+  "83": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "82",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 1664,
+      "height": 2080,
+      "crop": "disabled"
+    },
+    "_meta": {
+      "title": "Deliver 1664 × 2080"
+    }
+  },
+  "84": {
+    "class_type": "ImageScaleBy",
+    "inputs": {
+      "image": [
+        "79",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "scale_by": 2.0
+    },
+    "_meta": {
+      "title": "Lanczos 2× · base layer"
+    }
+  },
+  "85": {
+    "class_type": "ImageBlend",
+    "inputs": {
+      "image1": [
+        "84",
+        0
+      ],
+      "image2": [
+        "83",
+        0
+      ],
+      "blend_factor": 0.25,
+      "blend_mode": "normal"
+    },
+    "_meta": {
+      "title": "Mix 25% recovered texture"
+    }
+  },
+  "86": {
+    "class_type": "ImageSharpen",
+    "inputs": {
+      "image": [
+        "85",
+        0
+      ],
+      "sharpen_radius": 1,
+      "sigma": 0.8,
+      "alpha": 0.12
+    },
+    "_meta": {
+      "title": "Light output sharpening"
+    }
+  },
+  "87": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "86",
+        0
+      ],
+      "batch_index": 0,
+      "length": 1
+    },
+    "_meta": {
+      "title": "01 full look"
+    }
+  },
+  "88": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "87",
+        0
+      ],
+      "filename_prefix": "FootwearSession/DEMO-SNK-001/01_full_look"
+    },
+    "_meta": {
+      "title": "01 · 4:5 master PNG"
+    }
+  },
+  "89": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "87",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 416,
+      "height": 520,
+      "crop": "disabled"
+    },
+    "_meta": {
+      "title": "01 · review size"
+    }
+  },
+  "90": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "86",
+        0
+      ],
+      "batch_index": 1,
+      "length": 1
+    },
+    "_meta": {
+      "title": "02 on foot side"
+    }
+  },
+  "91": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "90",
+        0
+      ],
+      "filename_prefix": "FootwearSession/DEMO-SNK-001/02_on_foot_side"
+    },
+    "_meta": {
+      "title": "02 · 4:5 master PNG"
+    }
+  },
+  "92": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "90",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 416,
+      "height": 520,
+      "crop": "disabled"
+    },
+    "_meta": {
+      "title": "02 · review size"
+    }
+  },
+  "93": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "86",
+        0
+      ],
+      "batch_index": 2,
+      "length": 1
+    },
+    "_meta": {
+      "title": "03 on foot heel"
+    }
+  },
+  "94": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "93",
+        0
+      ],
+      "filename_prefix": "FootwearSession/DEMO-SNK-001/03_on_foot_heel"
+    },
+    "_meta": {
+      "title": "03 · 4:5 master PNG"
+    }
+  },
+  "95": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "93",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 416,
+      "height": 520,
+      "crop": "disabled"
+    },
+    "_meta": {
+      "title": "03 · review size"
+    }
+  },
+  "96": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "86",
+        0
+      ],
+      "batch_index": 3,
+      "length": 1
+    },
+    "_meta": {
+      "title": "04 pair still life"
+    }
+  },
+  "97": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "96",
+        0
+      ],
+      "filename_prefix": "FootwearSession/DEMO-SNK-001/04_pair_still_life"
+    },
+    "_meta": {
+      "title": "04 · 4:5 master PNG"
+    }
+  },
+  "98": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "96",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 416,
+      "height": 520,
+      "crop": "disabled"
+    },
+    "_meta": {
+      "title": "04 · review size"
+    }
+  },
+  "99": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "89",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": false,
+      "spacing_width": 12,
+      "spacing_color": "white",
+      "image2": [
+        "92",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Full look + side"
+    }
+  },
+  "100": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "95",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": false,
+      "spacing_width": 12,
+      "spacing_color": "white",
+      "image2": [
+        "98",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Heel + pair"
+    }
+  },
+  "101": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "99",
+        0
+      ],
+      "direction": "down",
+      "match_image_size": false,
+      "spacing_width": 12,
+      "spacing_color": "white",
+      "image2": [
+        "100",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Four-frame review sheet"
+    }
+  },
+  "102": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "101",
+        0
+      ],
+      "filename_prefix": "FootwearSession/DEMO-SNK-001/00_review_sheet"
+    },
+    "_meta": {
+      "title": "Review sheet · four frames"
+    }
+  }
+}
